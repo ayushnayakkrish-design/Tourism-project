@@ -8,6 +8,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from app.database import Base, get_db
 from app.gamification.models import Reward, RewardStatus, Wallet, PointTransaction, TransactionType
@@ -20,11 +21,15 @@ from app.gamification.wallet_service import WalletService
 
 @pytest.fixture
 def client_db():
-    engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
+    from app.main import app  # import first so all models register
+
+    engine = create_engine(
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
     Base.metadata.create_all(engine)
     TestSession = sessionmaker(bind=engine, autocommit=False, autoflush=False)
-
-    from app.main import app
 
     def override_db():
         db = TestSession()
