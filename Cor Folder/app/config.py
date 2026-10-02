@@ -21,6 +21,17 @@ class Settings(BaseSettings):
     AUTO_CREATE_DB: bool = False
     LOG_LEVEL: str = "INFO"
 
+    # -----------------------------------------------------------------------
+    # Developer 2 — Gamification settings
+    # -----------------------------------------------------------------------
+    # Points awarded when a visit is GPS-verified.
+    VISIT_REWARD_POINTS: int = Field(default=50, ge=0)
+    # Points awarded when a photo proof is accepted on a verified visit.
+    PHOTO_REWARD_POINTS: int = Field(default=10, ge=0)
+    # Default GPS verification radius in metres (used when the place record
+    # does not specify its own radius).
+    DEFAULT_VISIT_RADIUS_METERS: float = Field(default=150.0, gt=0)
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", case_sensitive=True)
 
     @staticmethod

@@ -5,7 +5,8 @@ from alembic import context
 
 from app.config import settings
 from app.database import Base
-from app import models  # noqa: F401
+from app import models  # noqa: F401  — Developer 1 models
+from app.gamification import models as gamification_models  # noqa: F401  — Developer 2 models
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL.replace("%", "%%"))

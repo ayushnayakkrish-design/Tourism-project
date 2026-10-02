@@ -17,6 +17,11 @@ from app.api.planner import router as planner_router
 from app.api.routes import router as routes_router
 from app.api.season import router as season_router
 
+# Developer 2 — Gamification routers
+from app.gamification.api_visits import router as visits_router
+from app.gamification.api_wallet import router as wallet_router
+from app.gamification.api_rewards import router as rewards_router
+
 logging.basicConfig(level=getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO), format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("tourism")
 
@@ -34,8 +39,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_credentials=False,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "X-Request-ID"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-Request-ID", "X-User-ID", "X-User-Role"],
 )
 
 
@@ -85,6 +90,11 @@ app.include_router(routes_router, prefix="/api/routes", tags=["Routes"])
 app.include_router(crowd_router, prefix="/api/crowd", tags=["Crowd"])
 app.include_router(planner_router, prefix="/api/planner", tags=["Planner"])
 app.include_router(season_router, prefix="/api/season", tags=["Season"])
+
+# Developer 2 — Gamification, Visit Verification & Rewards
+app.include_router(visits_router, prefix="/api/visits", tags=["Visits"])
+app.include_router(wallet_router, prefix="/api", tags=["Wallet"])
+app.include_router(rewards_router, prefix="/api", tags=["Rewards"])
 
 
 @app.get("/health", tags=["Health"])
