@@ -87,7 +87,7 @@ def extract_intent(text: str) -> dict:
 
 async def extract_intent_with_ai(text: str) -> dict:
     """Use strict structured extraction when configured; otherwise use local rules."""
-    if not settings.OPENAI_API_KEY:
+    if not settings.OPENAI_API_KEY or settings.OPENAI_API_KEY.startswith("optional_") or settings.OPENAI_API_KEY.startswith("your_"):
         return extract_intent(text)
     schema = {
         "type": "object",

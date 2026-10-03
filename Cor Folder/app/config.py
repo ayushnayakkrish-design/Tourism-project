@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     APP_VERSION: str = "2.0.0"
     ENVIRONMENT: str = "development"
     CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
-    ALLOWED_HOSTS: str = "127.0.0.1,localhost"
+    ALLOWED_HOSTS: str = "127.0.0.1,localhost,testserver"
     RATE_LIMIT_PER_MINUTE: int = Field(default=120, ge=0, le=10000)
     GOOGLE_TIMEOUT_SECONDS: float = Field(default=20.0, gt=1, le=120)
     GOOGLE_RETRIES: int = Field(default=2, ge=0, le=5)

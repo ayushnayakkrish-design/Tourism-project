@@ -9,7 +9,7 @@ class GeocodingService:
     BASE = "https://maps.googleapis.com/maps/api/geocode/json"
 
     async def geocode(self, address: str):
-        if not settings.GOOGLE_MAPS_API_KEY:
+        if not settings.GOOGLE_MAPS_API_KEY or settings.GOOGLE_MAPS_API_KEY.startswith("your_"):
             raise HTTPException(status_code=503, detail={"code": "GOOGLE_MAPS_NOT_CONFIGURED", "message": "Google Maps integration is not configured"})
         params = {"address": address.strip(), "key": settings.GOOGLE_MAPS_API_KEY}
         headers = {"Accept": "application/json"}

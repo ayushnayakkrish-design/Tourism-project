@@ -12,7 +12,7 @@ class PlacesService:
         self.api_key = settings.GOOGLE_MAPS_API_KEY
 
     def _headers(self, field_mask: str):
-        if not self.api_key:
+        if not self.api_key or self.api_key.startswith("your_"):
             raise HTTPException(status_code=503, detail={"code": "GOOGLE_MAPS_NOT_CONFIGURED", "message": "Google Maps integration is not configured"})
         return {
             "Content-Type": "application/json",

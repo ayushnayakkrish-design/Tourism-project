@@ -11,7 +11,7 @@ OPENAI_URL = "https://api.openai.com/v1/responses"
 
 class AIService:
     async def explain_itinerary(self, itinerary: dict) -> dict:
-        if not settings.OPENAI_API_KEY:
+        if not settings.OPENAI_API_KEY or settings.OPENAI_API_KEY.startswith("optional_") or settings.OPENAI_API_KEY.startswith("your_"):
             return {
                 "enabled": False,
                 "explanation": "AI explanation is disabled. Set OPENAI_API_KEY to enable it.",

@@ -6,6 +6,8 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
+from typing import Any, Optional
+
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Index, Integer, JSON, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -52,10 +54,10 @@ class CommunitySubmission(Base):
     latitude: Mapped[float] = mapped_column(Float, nullable=False)
     longitude: Mapped[float] = mapped_column(Float, nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
-    photos: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    photos: Mapped[list[Any]] = mapped_column(JSON, nullable=False, default=list)
     language: Mapped[str] = mapped_column(String(10), nullable=False, default="en")
     status: Mapped[str] = mapped_column(String(16), nullable=False, default="PENDING", index=True)
-    moderator_id: Mapped[str | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    moderator_id: Mapped[Optional[str]] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     moderator_note: Mapped[str] = mapped_column(Text, nullable=False, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now, onupdate=utc_now)
@@ -74,7 +76,7 @@ class Review(Base):
     rating: Mapped[int] = mapped_column(Integer, nullable=False)
     comment: Mapped[str] = mapped_column(Text, nullable=False, default="")
     status: Mapped[str] = mapped_column(String(16), nullable=False, default="PENDING", index=True)
-    moderator_id: Mapped[str | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    moderator_id: Mapped[Optional[str]] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     moderator_note: Mapped[str] = mapped_column(Text, nullable=False, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now, onupdate=utc_now)

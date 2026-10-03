@@ -153,9 +153,9 @@ class MockPlaceProvider(PlaceProvider):
 
 def get_place_provider() -> PlaceProvider:
     """
-    Returns GooglePlaceProvider when GOOGLE_MAPS_API_KEY is set,
+    Returns GooglePlaceProvider when GOOGLE_MAPS_API_KEY is set and valid,
     otherwise returns MockPlaceProvider for development/testing.
     """
-    if settings.GOOGLE_MAPS_API_KEY:
+    if settings.GOOGLE_MAPS_API_KEY and not settings.GOOGLE_MAPS_API_KEY.startswith("your_") and not settings.GOOGLE_MAPS_API_KEY.startswith("test_"):
         return GooglePlaceProvider()
     return MockPlaceProvider()
