@@ -5,6 +5,7 @@ with an in-memory SQLite database.
 from __future__ import annotations
 
 import pytest
+from fastapi import HTTPException, Request
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -13,6 +14,7 @@ from sqlalchemy.pool import StaticPool
 from app.database import Base, get_db
 from app.gamification.models import Reward, RewardStatus, Wallet, PointTransaction, TransactionType
 from app.gamification.wallet_service import WalletService
+from app.gamification.auth_stub import CurrentUser, get_current_user
 
 
 # ---------------------------------------------------------------------------
@@ -39,6 +41,17 @@ def client_db():
             db.close()
 
     app.dependency_overrides[get_db] = override_db
+
+    # Keep these service tests isolated from identity-provider details. JWT
+    # behavior is covered by Developer 3 integration tests.
+    def test_identity(request: Request):
+        user_id = request.headers.get("X-User-ID")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Authentication required")
+        role = "admin" if request.headers.get("X-User-Role", "user").lower() == "admin" else "user"
+        return CurrentUser(user_id=user_id, role=role)
+
+    app.dependency_overrides[get_current_user] = test_identity
     db = TestSession()
     yield TestClient(app), db
     db.close()

@@ -18,6 +18,15 @@ class Settings(BaseSettings):
     GOOGLE_RETRIES: int = Field(default=2, ge=0, le=5)
     OPENAI_TIMEOUT_SECONDS: float = Field(default=30.0, gt=1, le=120)
     OPENAI_RETRIES: int = Field(default=2, ge=0, le=5)
+    # Developer 3 — authentication and language-provider settings.
+    AUTH_SECRET: str = ""
+    ACCESS_TOKEN_MINUTES: int = Field(default=60, ge=5, le=1440)
+    TRANSLATION_API_URL: str = ""
+    TRANSLATION_API_KEY: str = ""
+    SPEECH_TO_TEXT_API_URL: str = ""
+    SPEECH_TO_TEXT_API_KEY: str = ""
+    BOOTSTRAP_ADMIN_EMAIL: str = ""
+    BOOTSTRAP_ADMIN_PASSWORD: str = ""
     AUTO_CREATE_DB: bool = False
     LOG_LEVEL: str = "INFO"
 

@@ -164,14 +164,11 @@ POST   /api/admin/users/{id}/points/adjust  Manual point adjustment
 
 ## 🔐 Authentication
 
-**Current**: Development stub using `X-User-ID` and `X-User-Role` headers.
+**Current**: Developer 3 bearer-token authentication, adapted through `app/gamification/auth_stub.py`.
 
 **Integration Point**: `app/gamification/auth_stub.py`
 
-When Developer 3 completes the authentication system:
-1. Update `get_current_user()` to decode JWT/session tokens
-2. Keep the `CurrentUser` interface unchanged
-3. No other files need modification
+`get_current_user()` now reads the authenticated account from the bearer token and database. Only `SUPER_ADMIN` maps to Developer 2's `admin`; other roles map to `user`. Client-supplied identity headers are ignored. The `CurrentUser` interface and Developer 2 route/business logic remain unchanged.
 
 **Critical Rule**: User identity ALWAYS comes from authentication, NEVER from request body/query params.
 
@@ -315,9 +312,9 @@ python -m pytest tests/ -v
 **Changes**:
 1. Imported Developer 2 routers
 2. Registered 3 new routers
-3. Added `PATCH`, `DELETE`, `X-User-ID`, `X-User-Role` to CORS
+3. Added `PATCH` and `DELETE` to CORS for Developer 2's API methods. Developer 3 later added bearer-token authentication and restricted CORS to `Authorization` rather than identity headers.
 
-**Reason**: Mount Developer 2 API endpoints and enable authentication headers.
+**Reason**: Mount Developer 2 API endpoints; authenticated requests now use the shared bearer-token contract.
 
 ### `alembic/env.py`
 **Change**: Imported `app.gamification.models` alongside `app.models`.
@@ -351,10 +348,11 @@ uvicorn app.main:app --reload
 
 ### 4. Test API
 ```bash
+# Log in through /api/auth/login and use the returned bearer token.
 # Create a visit (inside radius → VERIFIED)
 curl -X POST http://localhost:8000/api/visits \
   -H "Content-Type: application/json" \
-  -H "X-User-ID: tourist-123" \
+  -H "Authorization: Bearer <access_token>" \
   -d '{
     "place_id": "PLACE-KONARK",
     "latitude": 19.8878,
@@ -364,28 +362,25 @@ curl -X POST http://localhost:8000/api/visits \
 
 # Check wallet
 curl http://localhost:8000/api/wallet \
-  -H "X-User-ID: tourist-123"
+  -H "Authorization: Bearer <access_token>"
 
 # Browse rewards
 curl http://localhost:8000/api/rewards \
-  -H "X-User-ID: tourist-123"
+  -H "Authorization: Bearer <access_token>"
 ```
 
 ---
 
 ## 🔄 Developer 3 Handoff
 
-When integrating with Developer 3's authentication:
-
-1. **Replace** `app/gamification/auth_stub.py:get_current_user()`
-2. **Keep** the `CurrentUser` interface:
+The integration keeps this `CurrentUser` interface:
    ```python
    @dataclass(frozen=True)
    class CurrentUser:
        user_id: str
        role: str  # "user" | "admin"
    ```
-3. All Developer 2 code remains unchanged.
+Developer 2 route and business logic remain unchanged; only the auth adapter now uses Developer 3 JWT identity.
 
 ---
 
@@ -444,3 +439,5 @@ When integrating with Developer 3's authentication:
 
 **Implementation Complete** ✅  
 Developer 2's scope is fully implemented, tested, documented, and ready for integration.
+
+
