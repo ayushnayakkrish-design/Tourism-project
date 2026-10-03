@@ -77,6 +77,8 @@ Open:
 
 ## 5. Main APIs
 
+Developer 3's account, community, moderation, translation, and voice/query routes are documented in [`API_CONTRACT.md`](API_CONTRACT.md). Set a unique `AUTH_SECRET` in `.env` before starting the service. Optional translation and speech-to-text providers are configured through the `TRANSLATION_API_*` and `SPEECH_TO_TEXT_API_*` variables.
+
 ### Places
 
 ```text

@@ -8,6 +8,7 @@ import io
 from datetime import datetime, timezone
 
 import pytest
+from fastapi import HTTPException, Request
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -16,6 +17,7 @@ from sqlalchemy.pool import StaticPool
 from app.database import Base, get_db
 from app.gamification.models import Visit, VisitStatus, Wallet, PointTransaction, TransactionType
 from app.gamification.place_provider import MockPlaceProvider, PlaceInfo
+from app.gamification.auth_stub import CurrentUser, get_current_user
 
 
 # ---------------------------------------------------------------------------
@@ -49,6 +51,17 @@ def client_db():
 
     # Override get_db
     app.dependency_overrides[get_db] = override_db
+
+    # Developer 2 service tests use a test-only identity dependency. Production
+    # requests use Developer 3's JWT adapter and never trust these headers.
+    def test_identity(request: Request):
+        user_id = request.headers.get("X-User-ID")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Authentication required")
+        role = "admin" if request.headers.get("X-User-Role", "user").lower() == "admin" else "user"
+        return CurrentUser(user_id=user_id, role=role)
+
+    app.dependency_overrides[get_current_user] = test_identity
 
     # Monkeypatch _visit_service to use MockPlaceProvider
     original_visit_service = api_visits._visit_service
